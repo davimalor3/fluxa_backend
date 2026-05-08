@@ -1,0 +1,215 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model comandas {
+  id                                      String                    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  mesa_id                                 String                    @db.Uuid
+  restaurante_id                          String                    @db.Uuid
+  status                                  comanda_status?           @default(ABERTA)
+  total                                   Decimal?                  @default(0) @db.Decimal(10, 2)
+  aberta_por                              String?                   @db.Uuid
+  fechada_por                             String?                   @db.Uuid
+  data_abertura                           DateTime?                 @default(now()) @db.Timestamp(6)
+  data_fechamento                         DateTime?                 @db.Timestamp(6)
+  created_at                              DateTime?                 @default(now()) @db.Timestamp(6)
+  updated_at                              DateTime?                 @db.Timestamp(6)
+  usuarios_comandas_aberta_porTousuarios  usuarios?                 @relation("comandas_aberta_porTousuarios", fields: [aberta_por], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios_comandas_fechada_porTousuarios usuarios?                 @relation("comandas_fechada_porTousuarios", fields: [fechada_por], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mesas                                   mesas                     @relation(fields: [mesa_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  restaurantes                            restaurantes              @relation(fields: [restaurante_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  itens_comanda                           itens_comanda[]
+  pagamentos                              pagamentos[]
+  solicitacoes_fechamento                 solicitacoes_fechamento[]
+
+  @@index([mesa_id], map: "idx_comanda_mesa")
+  @@index([restaurante_id], map: "idx_comanda_restaurante")
+  @@index([status], map: "idx_comanda_status")
+}
+
+model estoque_movimentacoes {
+  id             String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  produto_id     String         @db.Uuid
+  restaurante_id String         @db.Uuid
+  tipo           movimento_tipo
+  quantidade     Decimal        @db.Decimal(10, 3)
+  motivo         String?        @db.VarChar(255)
+  referencia_id  String?        @db.Uuid
+  created_at     DateTime?      @default(now()) @db.Timestamp(6)
+  produtos       produtos       @relation(fields: [produto_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  restaurantes   restaurantes   @relation(fields: [restaurante_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([produto_id], map: "idx_estoque_movimentacao_produto")
+  @@index([restaurante_id], map: "idx_estoque_movimentacao_restaurante")
+}
+
+model ficha_tecnica {
+  id                                          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  produto_id                                  String    @db.Uuid
+  insumo_id                                   String    @db.Uuid
+  quantidade                                  Decimal   @db.Decimal(10, 3)
+  created_at                                  DateTime? @default(now()) @db.Timestamp(6)
+  produtos_ficha_tecnica_insumo_idToprodutos  produtos  @relation("ficha_tecnica_insumo_idToprodutos", fields: [insumo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  produtos_ficha_tecnica_produto_idToprodutos produtos  @relation("ficha_tecnica_produto_idToprodutos", fields: [produto_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([insumo_id], map: "idx_ficha_tecnica_insumo")
+  @@index([produto_id], map: "idx_ficha_tecnica_produto")
+}
+
+model inventarios {
+  id              String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  produto_id      String       @db.Uuid
+  restaurante_id  String       @db.Uuid
+  quantidade_real Decimal      @db.Decimal(10, 3)
+  data            DateTime?    @default(now()) @db.Timestamp(6)
+  produtos        produtos     @relation(fields: [produto_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  restaurantes    restaurantes @relation(fields: [restaurante_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([produto_id], map: "idx_inventario_produto")
+}
+
+model itens_comanda {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  comanda_id     String    @db.Uuid
+  produto_id     String    @db.Uuid
+  quantidade     Decimal   @db.Decimal(10, 3)
+  preco_unitario Decimal   @db.Decimal(10, 2)
+  subtotal       Decimal   @db.Decimal(10, 2)
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  comandas       comandas  @relation(fields: [comanda_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  produtos       produtos  @relation(fields: [produto_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([comanda_id], map: "idx_itens_comanda")
+}
+
+model mesas {
+  id             String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  numero         Int
+  restaurante_id String       @db.Uuid
+  ativo          Boolean?     @default(true)
+  created_at     DateTime?    @default(now()) @db.Timestamp(6)
+  comandas       comandas[]
+  restaurantes   restaurantes @relation(fields: [restaurante_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([numero, restaurante_id])
+  @@index([restaurante_id], map: "idx_mesa_restaurante")
+}
+
+model pagamentos {
+  id              String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  comanda_id      String          @db.Uuid
+  valor_total     Decimal         @db.Decimal(10, 2)
+  forma_pagamento forma_pagamento
+  data_pagamento  DateTime?       @default(now()) @db.Timestamp(6)
+  created_at      DateTime?       @default(now()) @db.Timestamp(6)
+  comandas        comandas        @relation(fields: [comanda_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([comanda_id], map: "idx_pagamento_comanda")
+}
+
+model produtos {
+  id                                               String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nome                                             String                  @db.VarChar(255)
+  descricao                                        String?
+  preco                                            Decimal?                @db.Decimal(10, 2)
+  quantidade                                       Decimal?                @default(0) @db.Decimal(10, 3)
+  tipo                                             produto_tipo
+  ativo                                            Boolean?                @default(true)
+  restaurante_id                                   String                  @db.Uuid
+  created_at                                       DateTime?               @default(now()) @db.Timestamp(6)
+  updated_at                                       DateTime?               @db.Timestamp(6)
+  deleted_at                                       DateTime?               @db.Timestamp(6)
+  estoque_movimentacoes                            estoque_movimentacoes[]
+  ficha_tecnica_ficha_tecnica_insumo_idToprodutos  ficha_tecnica[]         @relation("ficha_tecnica_insumo_idToprodutos")
+  ficha_tecnica_ficha_tecnica_produto_idToprodutos ficha_tecnica[]         @relation("ficha_tecnica_produto_idToprodutos")
+  inventarios                                      inventarios[]
+  itens_comanda                                    itens_comanda[]
+  restaurantes                                     restaurantes            @relation(fields: [restaurante_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([nome], map: "idx_produto_nome")
+  @@index([restaurante_id], map: "idx_produto_restaurante")
+}
+
+model restaurantes {
+  id                    String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nome                  String                  @db.VarChar(255)
+  cnpj                  String?                 @db.VarChar(20)
+  endereco              String?
+  created_at            DateTime?               @default(now()) @db.Timestamp(6)
+  comandas              comandas[]
+  estoque_movimentacoes estoque_movimentacoes[]
+  inventarios           inventarios[]
+  mesas                 mesas[]
+  produtos              produtos[]
+  usuarios              usuarios[]
+}
+
+model solicitacoes_fechamento {
+  id             String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  comanda_id     String              @db.Uuid
+  solicitado_por String              @db.Uuid
+  status         solicitacao_status? @default(PENDENTE)
+  created_at     DateTime?           @default(now()) @db.Timestamp(6)
+  comandas       comandas            @relation(fields: [comanda_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios       usuarios            @relation(fields: [solicitado_por], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([comanda_id], map: "idx_solicitacao_comanda")
+}
+
+model usuarios {
+  id                                      String                    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nome                                    String                    @db.VarChar(255)
+  email                                   String                    @unique @db.VarChar(255)
+  senha                                   String
+  role                                    user_role
+  restaurante_id                          String                    @db.Uuid
+  ativo                                   Boolean?                  @default(true)
+  created_at                              DateTime?                 @default(now()) @db.Timestamp(6)
+  updated_at                              DateTime?                 @db.Timestamp(6)
+  deleted_at                               DateTime?                 @db.Timestamp(6)
+  comandas_comandas_aberta_porTousuarios  comandas[]                @relation("comandas_aberta_porTousuarios")
+  comandas_comandas_fechada_porTousuarios comandas[]                @relation("comandas_fechada_porTousuarios")
+  solicitacoes_fechamento                 solicitacoes_fechamento[]
+  restaurantes                            restaurantes              @relation(fields: [restaurante_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([restaurante_id], map: "idx_usuario_restaurante")
+}
+
+enum comanda_status {
+  ABERTA
+  AGUARDANDO_FECHAMENTO
+  FECHADA
+}
+
+enum forma_pagamento {
+  PIX
+  CARTAO
+  DINHEIRO
+}
+
+enum movimento_tipo {
+  ENTRADA
+  SAIDA
+  AJUSTE
+}
+
+enum produto_tipo {
+  PRODUTO
+  INSUMO
+}
+
+enum solicitacao_status {
+  PENDENTE
+  APROVADA
+  REJEITADA
+}
+
+enum user_role {
+  GERENTE
+  GARCOM
+}
