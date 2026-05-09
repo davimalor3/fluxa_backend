@@ -1,26 +1,72 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+
+import { PrismaService } from 'prisma/prisma.service';
+
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { AuthUser } from '../auth/types/auth-user.interface';
 
 @Injectable()
 export class ProductsService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  constructor(private prisma: PrismaService) {}
+
+  async create(dto: CreateProductDto, user: AuthUser) {
+    return this.prisma.produtos.create({
+      data: {
+        ...dto,
+        restaurante_id: user.restauranteId,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all products`;
+  async findAll(restauranteId: string) {
+    return this.prisma.produtos.findMany({
+      where: {
+        restaurante_id: restauranteId,
+        deleted_at: null,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string, restauranteId: string) {
+    const product = await this.prisma.produtos.findFirst({
+      where: {
+        id,
+        restaurante_id: restauranteId,
+        deleted_at: null,
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Produto não encontrado');
+    }
+
+    return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: string, dto: UpdateProductDto, restauranteId: string) {
+    await this.findOne(id, restauranteId);
+
+    return this.prisma.produtos.update({
+      where: { id },
+      data: {
+        ...dto,
+        updated_at: new Date(),
+      },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string, restauranteId: string) {
+    await this.findOne(id, restauranteId);
+
+    return this.prisma.produtos.update({
+      where: { id },
+      data: {
+        deleted_at: new Date(),
+      },
+    });
   }
 }
