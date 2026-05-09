@@ -1,13 +1,4 @@
-export enum UserRole {
-  GERENTE = 'GERENTE',
-  GARCOM = 'GARCOM',
-}
-
-export interface AuthUser {
-  userId: string;
-  role: UserRole;
-  restauranteId: string;
-}
+import { UserRole } from './user-role.enum';
 
 export interface JwtPayload {
   sub: string; // normalmente o ID do usuário
