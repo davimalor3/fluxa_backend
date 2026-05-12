@@ -20,6 +20,12 @@ export class UsersService {
     });
   }
 
+  // TODO: Implement pagination
+  // REMOVER ESSA FUNÇÃO DEPOIS, apenas para teste de criação de usuário e login
+  async findAll() {
+    return this.prisma.usuarios.findMany();
+  }
+
   async create(dto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(dto.senha, 10);
 
