@@ -14,7 +14,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('JWT_SECRET')!,
-        signOptions: { expiresIn: '1h' }, // ajuste conforme necessidade
+        signOptions: { expiresIn: '30m' }, // teste de expiração do token
       }),
     }),
   ],
