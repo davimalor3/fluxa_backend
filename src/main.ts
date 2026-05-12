@@ -15,6 +15,16 @@ async function bootstrap() {
     }),
   );
 
+  // habilita o cors para permitir requisições do frontend
+  // provisório, depois vou configurar para aceitar só do domínio do frontend
+  app.enableCors({
+    origin: '*',
+  });
+
+  // configura um prefixo global para todas as rotas da API
+  // app.setGlobalPrefix('api');
+
+  // configurando o swagger para gerar a documentação da API
   const config = new DocumentBuilder()
     .setTitle('Fluxa API')
     .setDescription('Sistema de gestão para restaurantes')
