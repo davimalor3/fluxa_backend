@@ -34,7 +34,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     return {
       userId: sub,
-      role, // agora o TS sabe que só pode ser "GERENTE" | "GARCOM"
+      role, // só pode ser "GERENTE" | "GARCOM"
       restauranteId,
     };
   }

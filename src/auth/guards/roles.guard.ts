@@ -29,13 +29,13 @@ export class RolesGuard implements CanActivate {
     const user = request.user as AuthUser;
 
     if (!user) {
-      throw new ForbiddenException();
+      throw new ForbiddenException('Acesso negado: usuário não autenticado');
     }
 
     const hasRole = requiredRoles.includes(user.role);
 
     if (!hasRole) {
-      throw new ForbiddenException();
+      throw new ForbiddenException('Acesso negado: Não tem permissão');
     }
 
     return true;
