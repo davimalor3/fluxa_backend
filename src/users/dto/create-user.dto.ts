@@ -1,4 +1,5 @@
-import { IsEmail, IsEnum, IsString, IsUUID, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator';
+
 import { user_role } from '@prisma/client';
 
 export class CreateUserDto {
@@ -13,7 +14,4 @@ export class CreateUserDto {
 
   @IsEnum(user_role)
   role!: user_role;
-
-  @IsUUID()
-  restaurante_id!: string;
 }
