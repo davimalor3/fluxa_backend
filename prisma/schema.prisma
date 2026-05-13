@@ -8,7 +8,7 @@ datasource db {
 }
 
 model comandas {
-  id                                      String                    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                                      String                    @id @default(uuid()) @db.Uuid
   mesa_id                                 String                    @db.Uuid
   restaurante_id                          String                    @db.Uuid
   status                                  comanda_status            @default(ABERTA)
@@ -35,7 +35,7 @@ model comandas {
 }
 
 model estoque_movimentacoes {
-  id             String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id             String         @id @default(uuid()) @db.Uuid
   produto_id     String         @db.Uuid
   restaurante_id String         @db.Uuid
   tipo           movimento_tipo
@@ -51,7 +51,7 @@ model estoque_movimentacoes {
 }
 
 model ficha_tecnica {
-  id                                          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                                          String    @id @default(uuid()) @db.Uuid
   produto_id                                  String    @db.Uuid
   insumo_id                                   String    @db.Uuid
   quantidade                                  Decimal   @db.Decimal(10, 3)
@@ -65,7 +65,7 @@ model ficha_tecnica {
 }
 
 model inventarios {
-  id              String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id              String       @id @default(uuid()) @db.Uuid
   produto_id      String       @db.Uuid
   restaurante_id  String       @db.Uuid
   quantidade_real Decimal      @db.Decimal(10, 3)
@@ -78,7 +78,7 @@ model inventarios {
 }
 
 model itens_comanda {
-  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id             String    @id @default(uuid()) @db.Uuid
   comanda_id     String    @db.Uuid
   produto_id     String    @db.Uuid
   quantidade     Decimal   @db.Decimal(10, 3)
@@ -93,7 +93,7 @@ model itens_comanda {
 }
 
 model mesas {
-  id             String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id             String       @id @default(uuid()) @db.Uuid
   numero         Int
   restaurante_id String       @db.Uuid
   ativo          Boolean      @default(true)
@@ -110,7 +110,7 @@ model mesas {
 }
 
 model pagamentos {
-  id              String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id              String          @id @default(uuid()) @db.Uuid
   comanda_id      String          @db.Uuid
   valor_total     Decimal         @db.Decimal(10, 2)
   forma_pagamento forma_pagamento
@@ -124,7 +124,7 @@ model pagamentos {
 }
 
 model produtos {
-  id                                               String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                                               String                  @id @default(uuid()) @db.Uuid
   nome                                             String                  @db.VarChar(255)
   descricao                                        String?
   preco                                            Decimal?                @db.Decimal(10, 2)
@@ -147,7 +147,7 @@ model produtos {
 }
 
 model restaurantes {
-  id                    String                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                    String                  @id @default(uuid()) @db.Uuid
   nome                  String                  @db.VarChar(255)
   cnpj                  String?                 @db.VarChar(20)
   endereco              String?
@@ -163,7 +163,7 @@ model restaurantes {
 }
 
 model solicitacoes_fechamento {
-  id             String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id             String              @id @default(uuid()) @db.Uuid
   comanda_id     String              @db.Uuid
   solicitado_por String              @db.Uuid
   status         solicitacao_status? @default(PENDENTE)
@@ -175,7 +175,7 @@ model solicitacoes_fechamento {
 }
 
 model usuarios {
-  id                                      String                    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                                      String                    @id @default(uuid()) @db.Uuid
   nome                                    String                    @db.VarChar(255)
   email                                   String                    @unique @db.VarChar(255)
   senha                                   String
