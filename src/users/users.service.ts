@@ -42,6 +42,15 @@ export class UsersService {
     });
   }
 
+  // MÉTODO APENAS PARA TESTE: RETORNA TODOS OS USUÁRIOS, INDEPENDENTE DO RESTAURANTE E DO STATUS DE EXCLUSÃO. NÃO DEVE SER USADO EM PRODUÇÃO.
+  findAllUsers() {
+    return this.prisma.usuarios.findMany({
+      where: {
+        deleted_at: null,
+      },
+    });
+  }
+
   findById(id: string) {
     return this.prisma.usuarios.findUnique({
       where: {
