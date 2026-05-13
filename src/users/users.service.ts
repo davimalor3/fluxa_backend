@@ -14,19 +14,11 @@ export class UsersService {
     });
   }
 
-  findById(id: string) {
-    return this.prisma.usuarios.findUnique({
-      where: { id },
-    });
-  }
-
   // TODO: Implement pagination
-  // REMOVER ESSA FUNÇÃO DEPOIS, apenas para teste de criação de usuário e login
-  async findAll() {
-    return this.prisma.usuarios.findMany();
-  }
+  // TODO: Implementar atualização e remoção de usuários
 
-  async create(dto: CreateUserDto) {
+  // Método para criar um novo usuário associado a um restaurante
+  async create(dto: CreateUserDto, restauranteId: string) {
     const hashedPassword = await bcrypt.hash(dto.senha, 10);
 
     return this.prisma.usuarios.create({
@@ -35,7 +27,25 @@ export class UsersService {
         email: dto.email,
         senha: hashedPassword,
         role: dto.role,
-        restaurante_id: dto.restaurante_id,
+        restaurante_id: restauranteId,
+      },
+    });
+  }
+
+  // aqui retorna todos os usuários de um restaurante específico, filtrando por restaurante_id e garantindo que apenas os usuários ativos (deleted_at: null) sejam retornados.
+  findAll(restauranteId: string) {
+    return this.prisma.usuarios.findMany({
+      where: {
+        restaurante_id: restauranteId,
+        deleted_at: null,
+      },
+    });
+  }
+
+  findById(id: string) {
+    return this.prisma.usuarios.findUnique({
+      where: {
+        id,
       },
     });
   }
