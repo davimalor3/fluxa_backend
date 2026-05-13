@@ -21,6 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  // implementar futuramente validação no banco e validação de assinatura ativa
   validate(payload: JwtPayload): AuthUser {
     const { sub, role, restauranteId } = payload;
 
