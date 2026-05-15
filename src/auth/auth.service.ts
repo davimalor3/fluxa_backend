@@ -118,6 +118,7 @@ export class AuthService {
       // aqui retorno as informações do usuário que serão usadas no frontend para exibir o nome do usuário, o email, o papel e o id do restaurante
       user: {
         id: user.id,
+        nome: user.nome,
         email: user.email,
         role: user.role,
         restaurante_id: user.restaurante_id,
