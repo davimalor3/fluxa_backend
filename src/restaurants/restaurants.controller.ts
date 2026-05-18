@@ -15,18 +15,18 @@ export class RestaurantsController {
 
   @Get('me')
   findMe(@CurrentUser() user: AuthUser) {
-    return this.restaurantsService.findById(user.restauranteId);
+    return this.restaurantsService.findById(user.restaurante_id);
   }
 
   @Patch('me')
   @Roles(UserRole.GERENTE)
   update(@CurrentUser() user: AuthUser, @Body() dto: UpdateRestaurantDto) {
-    return this.restaurantsService.update(user.restauranteId, dto);
+    return this.restaurantsService.update(user.restaurante_id, dto);
   }
 
   @Get('me/stats')
   @Roles(UserRole.GERENTE)
   stats(@CurrentUser() user: AuthUser) {
-    return this.restaurantsService.stats(user.restauranteId);
+    return this.restaurantsService.stats(user.restaurante_id);
   }
 }

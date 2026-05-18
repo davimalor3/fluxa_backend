@@ -18,14 +18,14 @@ export class UsersController {
   @Roles(UserRole.GERENTE)
   @Post('register')
   create(@Body() dto: CreateUserDto, @CurrentUser() user: AuthUser) {
-    return this.usersService.create(dto, user.restauranteId);
+    return this.usersService.create(dto, user.restaurante_id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.GERENTE)
   @Get()
   findAll(@CurrentUser() user: AuthUser) {
-    return this.usersService.findAll(user.restauranteId);
+    return this.usersService.findAll(user.restaurante_id);
   }
 
   // ROTA APENAS PARA TESTE: RETORNA TODOS OS USUÁRIOS, INDEPENDENTE DO RESTAURANTE E DO STATUS DE EXCLUSÃO. NÃO DEVE SER USADA EM PRODUÇÃO.
