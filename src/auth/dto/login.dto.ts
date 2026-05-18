@@ -17,6 +17,5 @@ export class LoginDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
-  @MaxLength(100)
   senha!: string;
 }
