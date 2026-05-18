@@ -11,6 +11,7 @@ import { InventoryModule } from './inventory/inventory.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { SubscriptionModule } from './subscription/subscription.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ConfigModule } from '@nestjs/config';
     InventoryModule,
     PaymentsModule,
     AuthModule,
+    SubscriptionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
