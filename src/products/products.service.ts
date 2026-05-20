@@ -14,7 +14,7 @@ export class ProductsService {
     return this.prisma.produtos.create({
       data: {
         ...dto,
-        restaurante_id: user.restauranteId,
+        restaurante_id: user.restaurante_id,
       },
     });
   }

@@ -26,12 +26,12 @@ export class ProductsController {
 
   @Get()
   findAll(@CurrentUser() user: AuthUser) {
-    return this.productsService.findAll(user.restauranteId);
+    return this.productsService.findAll(user.restaurante_id);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string, @CurrentUser() user: AuthUser) {
-    return this.productsService.findOne(id, user.restauranteId);
+    return this.productsService.findOne(id, user.restaurante_id);
   }
 
   @Patch(':id')
@@ -40,11 +40,11 @@ export class ProductsController {
     @Body() dto: UpdateProductDto,
     @CurrentUser() user: AuthUser,
   ) {
-    return this.productsService.update(id, dto, user.restauranteId);
+    return this.productsService.update(id, dto, user.restaurante_id);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
-    return this.productsService.remove(id, user.restauranteId);
+    return this.productsService.remove(id, user.restaurante_id);
   }
 }
