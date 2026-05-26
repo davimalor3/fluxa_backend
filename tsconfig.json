@@ -6,7 +6,10 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "ignoreDeprecations": "6.0",
-    "baseUrl": "./",
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["src/*"]
+    },
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
