@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { RestaurantsService } from './restaurants.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
-import type { AuthUser } from 'src/auth/types/auth-user.interface';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { UserRole } from 'src/auth/types/user-role.enum';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { AuthUser } from '../auth/types/auth-user.interface';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../auth/types/user-role.enum';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 
 @Controller('restaurants')

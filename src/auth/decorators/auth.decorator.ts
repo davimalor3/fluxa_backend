@@ -5,7 +5,7 @@ import { Roles } from './roles.decorator';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 
-import { SubscriptionGuard } from 'src/subscription/guards/subscription.guard';
+import { SubscriptionGuard } from '../../subscription/guards/subscription.guard';
 
 import { UserRole } from '../types/user-role.enum';
 
