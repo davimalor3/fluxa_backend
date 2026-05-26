@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 
-import { PrismaModule } from 'prisma/prisma.module';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 import { SubscriptionService } from './subscription.service';
 import { SubscriptionGuard } from './guards/subscription.guard';
