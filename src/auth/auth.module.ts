@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
@@ -8,6 +8,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaModule } from 'prisma/prisma.module';
 import { SubscriptionModule } from 'src/subscription/subscription.module';
 
+@Global()
 @Module({
   imports: [
     UsersModule,
