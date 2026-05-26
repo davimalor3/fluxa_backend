@@ -15,7 +15,7 @@ export class OrdersService {
   // (Altera status da mesa e cria a comanda em transação)
   async openOrder(dto: OpenOrderDto, restaurante_id: string, userId: string) {
     return this.prisma.$transaction(async (tx) => {
-      const mesa = await tx.mesas.findFirst({
+      const mesa = await tx.mesas.findUnique({
         where: { id: dto.mesa_id, restaurante_id, deleted_at: null },
       });
 
@@ -26,11 +26,20 @@ export class OrdersService {
         );
       }
 
-      // atualiza o status de mesa comp ocupada
-      await tx.mesas.update({
-        where: { id: mesa.id },
+      // atualiza o status de mesa comp ocupada e evita race conditions
+      const updated = await tx.mesas.updateMany({
+        where: {
+          id: dto.mesa_id,
+          restaurante_id,
+          status: 'DISPONIVEL',
+          deleted_at: null,
+        },
         data: { status: 'OCUPADA' },
       });
+
+      if (updated.count === 0) {
+        throw new BadRequestException('Mesa já está ocupada.');
+      }
 
       // inicia a comanda vinculada a uma mesa em questao
       return tx.comandas.create({
@@ -50,7 +59,7 @@ export class OrdersService {
   // (Calcula subtotal baseado no preço atual do produto e incrementa o total da comanda)
   async addItem(comanda_id: string, dto: AddItemDto, restaurante_id: string) {
     return this.prisma.$transaction(async (tx) => {
-      const comanda = await tx.comandas.findFirst({
+      const comanda = await tx.comandas.findUnique({
         where: { id: comanda_id, restaurante_id, status: 'ABERTA' },
       });
 

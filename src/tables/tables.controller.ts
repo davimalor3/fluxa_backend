@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  ParseUUIDPipe,
+  Delete,
+} from '@nestjs/common';
 import { TablesService } from './tables.service';
 import { CreateTableDto } from './dto/create-table.dto';
 import { Auth } from '../auth/decorators/auth.decorator'; // Ajuste o path se necessário
@@ -24,7 +32,19 @@ export class TablesController {
 
   @Get(':id')
   @Auth(UserRole.GERENTE, UserRole.GARCOM)
-  async findOne(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthUser,
+  ) {
     return this.tablesService.findOne(id, user.restaurante_id);
+  }
+
+  @Delete(':id')
+  @Auth(UserRole.GERENTE) // Apenas gerentes podem remover mesas
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.tablesService.remove(id, user.restaurante_id);
   }
 }
