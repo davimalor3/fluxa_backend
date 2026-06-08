@@ -15,3 +15,14 @@ export class CreateUserDto {
   @IsEnum(user_role)
   role!: user_role;
 }
+
+export class CreateGarcomDto {
+  @IsString()
+  nome!: string;
+
+  @IsEmail()
+  email!: string;
+
+  @MinLength(6)
+  senha!: string;
+}

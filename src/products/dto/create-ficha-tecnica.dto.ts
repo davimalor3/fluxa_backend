@@ -1,12 +1,12 @@
 import { Type } from 'class-transformer';
 import { IsNumber, IsUUID, Min } from 'class-validator';
 
-export class CreateInventoryDto {
+export class CreateFichaTecnicaDto {
   @IsUUID()
-  produto_id!: string;
+  insumo_id!: string;
 
   @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 3 })
-  @Min(0)
-  quantidade_real!: number;
+  @Min(0.001)
+  quantidade!: number;
 }

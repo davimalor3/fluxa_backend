@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -6,8 +7,8 @@ import {
   IsString,
   Min,
 } from 'class-validator';
-
-import { ProductType } from '../enums/product-type.enum';
+import { Type } from 'class-transformer';
+import { produto_tipo, unidade_produto } from '@prisma/client';
 
 export class CreateProductDto {
   @IsString()
@@ -18,15 +19,28 @@ export class CreateProductDto {
   @IsString()
   descricao?: string;
 
+  @Type(() => Number)
   @IsOptional()
-  @IsNumber()
+  @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   preco?: number;
 
-  @IsNumber()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 3 })
   @Min(0)
-  quantidade!: number;
+  quantidade?: number;
 
-  @IsEnum(ProductType)
-  tipo!: ProductType;
+  @IsEnum(produto_tipo)
+  tipo!: produto_tipo;
+
+  @IsEnum(unidade_produto)
+  unidade_medida!: unidade_produto;
+
+  @IsOptional()
+  @IsBoolean()
+  controla_estoque?: boolean = true;
+
+  @IsOptional()
+  @IsBoolean()
+  ativo?: boolean = true;
 }

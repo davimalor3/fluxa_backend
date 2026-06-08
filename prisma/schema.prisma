@@ -32,19 +32,21 @@ model comandas {
   @@index([mesa_id], map: "idx_comanda_mesa")
   @@index([restaurante_id], map: "idx_comanda_restaurante")
   @@index([status], map: "idx_comanda_status")
+  @@index([data_fechamento], map: "idx_comanda_data_fechamento")
 }
 
 model estoque_movimentacoes {
-  id             String         @id @default(uuid()) @db.Uuid
-  produto_id     String         @db.Uuid
-  restaurante_id String         @db.Uuid
-  tipo           movimento_tipo
-  quantidade     Decimal        @db.Decimal(10, 3)
-  motivo         String?        @db.VarChar(255)
-  referencia_id  String?        @db.Uuid
-  created_at     DateTime?      @default(now()) @db.Timestamp(6)
-  produtos       produtos       @relation(fields: [produto_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  restaurantes   restaurantes   @relation(fields: [restaurante_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id              String           @id @default(uuid()) @db.Uuid
+  produto_id      String           @db.Uuid
+  restaurante_id  String           @db.Uuid
+  tipo            movimento_tipo
+  quantidade      Decimal          @db.Decimal(10, 3)
+  motivo          String?          @db.VarChar(255)
+  referencia_id   String?          @db.Uuid
+  referencia_tipo referencia_tipo?
+  created_at      DateTime?        @default(now()) @db.Timestamp(6)
+  produtos        produtos         @relation(fields: [produto_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  restaurantes    restaurantes     @relation(fields: [restaurante_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([produto_id], map: "idx_estoque_movimentacao_produto")
   @@index([restaurante_id], map: "idx_estoque_movimentacao_restaurante")
@@ -70,7 +72,7 @@ model inventarios {
   restaurante_id  String       @db.Uuid
   quantidade_real Decimal      @db.Decimal(10, 3)
   data            DateTime?    @default(now()) @db.Timestamp(6)
-  updated_at      DateTime     @updatedAt @db.Timestamp(6) 
+  updated_at      DateTime     @updatedAt @db.Timestamp(6)
   produtos        produtos     @relation(fields: [produto_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   restaurantes    restaurantes @relation(fields: [restaurante_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -99,7 +101,7 @@ model mesas {
   ativo          Boolean      @default(true)
   status         mesa_status  @default(DISPONIVEL)
   observacao     String?      @db.VarChar(255)
-  created_at     DateTime    @default(now()) @db.Timestamp(6)
+  created_at     DateTime     @default(now()) @db.Timestamp(6)
   updated_at     DateTime     @updatedAt @db.Timestamp(6)
   deleted_at     DateTime?    @db.Timestamp(6)
   comandas       comandas[]
@@ -112,6 +114,7 @@ model mesas {
 model pagamentos {
   id              String          @id @default(uuid()) @db.Uuid
   comanda_id      String          @db.Uuid
+  registrado_por  String?         @db.Uuid
   valor_total     Decimal         @db.Decimal(10, 2)
   forma_pagamento forma_pagamento
   data_pagamento  DateTime?       @default(now()) @db.Timestamp(6)
@@ -119,8 +122,11 @@ model pagamentos {
   updated_at      DateTime        @updatedAt @db.Timestamp(6)
   deleted_at      DateTime?       @db.Timestamp(6)
   comandas        comandas        @relation(fields: [comanda_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios        usuarios?       @relation(fields: [registrado_por], references: [id])
 
   @@index([comanda_id], map: "idx_pagamento_comanda")
+  @@index([forma_pagamento], map: "idx_pagamento_forma")
+  @@index([data_pagamento], map: "idx_pagamento_data")
 }
 
 model produtos {
@@ -136,6 +142,8 @@ model produtos {
   updated_at                                       DateTime                @updatedAt @db.Timestamp(6)
   deleted_at                                       DateTime?               @db.Timestamp(6)
   estoque_movimentacoes                            estoque_movimentacoes[]
+  controla_estoque                                 Boolean                 @default(true)
+  unidade_medida                                   unidade_produto
   ficha_tecnica_ficha_tecnica_insumo_idToprodutos  ficha_tecnica[]         @relation("ficha_tecnica_insumo_idToprodutos")
   ficha_tecnica_ficha_tecnica_produto_idToprodutos ficha_tecnica[]         @relation("ficha_tecnica_produto_idToprodutos")
   inventarios                                      inventarios[]
@@ -171,6 +179,7 @@ model usuarios {
   deleted_at                              DateTime?                 @db.Timestamp(6)
   comandas_comandas_aberta_porTousuarios  comandas[]                @relation("comandas_aberta_porTousuarios")
   comandas_comandas_fechada_porTousuarios comandas[]                @relation("comandas_fechada_porTousuarios")
+  pagamentos                              pagamentos[]
   solicitacoes_fechamento                 solicitacoes_fechamento[]
   restaurantes                            restaurantes              @relation(fields: [restaurante_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
@@ -183,15 +192,11 @@ model restaurantes {
   cnpj                  String?                 @db.VarChar(20)
   endereco              String?
   telefone              String?                 @db.VarChar(20)
-
   trial_ends_at         DateTime
   subscription_status   SubscriptionStatus      @default(TRIAL)
   is_active             Boolean                 @default(true)
-
-
   created_at            DateTime?               @default(now()) @db.Timestamp(6)
   updated_at            DateTime                @updatedAt @db.Timestamp(6)
-
   comandas              comandas[]
   estoque_movimentacoes estoque_movimentacoes[]
   inventarios           inventarios[]
@@ -201,14 +206,14 @@ model restaurantes {
 }
 
 model inviteCodes {
-  id                    String                  @id @default(uuid()) @db.Uuid
-  code                  String                  @unique
-  active                Boolean                 @default(true)
-  expires_at            DateTime?
-  max_uses              Int?
-  uses                  Int                     @default(0)
-  trial_days            Int                     @default(7)
-  created_at            DateTime                @default(now())
+  id         String    @id @default(uuid()) @db.Uuid
+  code       String    @unique
+  active     Boolean   @default(true)
+  expires_at DateTime?
+  max_uses   Int?
+  uses       Int       @default(0)
+  trial_days Int       @default(7)
+  created_at DateTime  @default(now())
 }
 
 enum SubscriptionStatus {
@@ -222,6 +227,7 @@ enum comanda_status {
   ABERTA
   AGUARDANDO_FECHAMENTO
   FECHADA
+  CANCELADA
 }
 
 enum mesa_status {
@@ -244,7 +250,8 @@ enum movimento_tipo {
 }
 
 enum produto_tipo {
-  PRODUTO
+  PRODUTO_SIMPLES
+  PRODUTO_COMPOSTO
   INSUMO
 }
 
@@ -259,3 +266,15 @@ enum user_role {
   GARCOM
 }
 
+enum referencia_tipo {
+  COMANDA
+  INVENTARIO
+  AJUSTE
+  ENTRADA_MANUAL
+}
+
+enum unidade_produto {
+  KG
+  L
+  UN
+}

@@ -7,11 +7,12 @@ import { RestaurantsModule } from './restaurants/restaurants.module';
 import { ProductsModule } from './products/products.module';
 import { TablesModule } from './tables/tables.module';
 import { OrdersModule } from './orders/orders.module';
-import { InventoryModule } from './inventory/inventory.module';
 import { PaymentsModule } from './payments/payments.module';
+import { InventoryModule } from './inventory/inventory.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -22,10 +23,11 @@ import { SubscriptionModule } from './subscription/subscription.module';
     ProductsModule,
     TablesModule,
     OrdersModule,
-    InventoryModule,
     PaymentsModule,
+    InventoryModule,
     AuthModule,
     SubscriptionModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,34 +1,48 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { CloseOrderDto } from './dto/close-order.dto';
 
-@Controller('payments')
+import { Auth } from '../auth/decorators/auth.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+
+import type { AuthUser } from '../auth/types/auth-user.interface';
+import { UserRole } from '../auth/types/user-role.enum';
+
+@Controller('pagamentos')
+@Auth(UserRole.GERENTE)
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  @Post()
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentsService.create(createPaymentDto);
+  // ========================================================= REGISTRAR PAGAMENTO
+  @Post('comandas/:id')
+  registrarPagamento(
+    @Param('id') comandaId: string,
+    @Body() dto: CloseOrderDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.paymentsService.registrarPagamento(
+      comandaId,
+      dto,
+      user.restaurante_id,
+      user.userId,
+    );
   }
 
-  @Get()
-  findAll() {
-    return this.paymentsService.findAll();
-  }
-
+  // ========================================================= BUSCAR PAGAMENTO
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentsService.findOne(+id);
+  buscarPagamento(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+    return this.paymentsService.buscarPagamento(id, user.restaurante_id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
-    return this.paymentsService.update(+id, updatePaymentDto);
+  // ========================================================= LISTAR PAGAMENTOS
+  @Get()
+  listarPagamentos(@CurrentUser() user: AuthUser) {
+    return this.paymentsService.listarPagamentos(user.restaurante_id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.paymentsService.remove(+id);
+  // ========================================================= RESUMO FINANCEIRO
+  @Get('resumo/financeiro')
+  obterResumoFinanceiro(@CurrentUser() user: AuthUser) {
+    return this.paymentsService.obterResumoFinanceiro(user.restaurante_id);
   }
 }

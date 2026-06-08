@@ -1,22 +1,49 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../auth/types/user-role.enum';
+import { CreateStockEntryDto } from './dto/create-stock-entry.dto';
+import { AuthUser } from 'src/auth/types/auth-user.interface';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { CreateInventoryDto } from './dto/create-inventory.dto';
 
 @Controller('estoque')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
-  // Teste de proteção de rota com JWT e roles
-  // implementar a rota de criação de item do estoque depois
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.GERENTE)
-  @Get()
-  findAll() {
-    return {
-      ok: true,
-    };
+  @Auth(UserRole.GERENTE)
+  @Post('entrada')
+  registrarEntrada(
+    @Body() dto: CreateStockEntryDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.inventoryService.registrarEntrada(dto, user.restaurante_id);
+  }
+
+  @Auth(UserRole.GERENTE)
+  @Post('inventario')
+  registrarInventario(
+    @Body() dto: CreateInventoryDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.inventoryService.registrarInventario(dto, user.restaurante_id);
+  }
+
+  @Auth(UserRole.GERENTE)
+  @Get('movimentacoes')
+  findMovimentacoes(@CurrentUser() user: AuthUser) {
+    return this.inventoryService.findMovimentacoes(user.restaurante_id);
+  }
+
+  @Auth(UserRole.GERENTE)
+  @Get('movimentacoes/:produtoId')
+  findMovimentacoesProduto(
+    @Param('produtoId') produtoId: string,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.inventoryService.findMovimentacoesProduto(
+      produtoId,
+      user.restaurante_id,
+    );
   }
 }

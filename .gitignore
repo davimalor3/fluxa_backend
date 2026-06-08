@@ -62,4 +62,3 @@ docker-compose.override.production.yml
 
 
 prisma/seed.ts
-prisma/migrations/
