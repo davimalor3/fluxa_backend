@@ -14,7 +14,7 @@ import { CreateGarcomDto, CreateUserDto } from './dto/create-user.dto';
 import { UserRole } from '../auth/types/user-role.enum';
 import type { AuthUser } from '../auth/types/auth-user.interface';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Auth } from '../auth/decorators/auth.decorator';
 import { UpdateGarcomDto } from './dto/update-garcom.dto';
 
 @Controller('users')

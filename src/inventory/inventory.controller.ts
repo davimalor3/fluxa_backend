@@ -2,9 +2,9 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { UserRole } from '../auth/types/user-role.enum';
 import { CreateStockEntryDto } from './dto/create-stock-entry.dto';
-import { AuthUser } from 'src/auth/types/auth-user.interface';
-import { Auth } from 'src/auth/decorators/auth.decorator';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { AuthUser } from '../auth/types/auth-user.interface';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 
 @Controller('estoque')

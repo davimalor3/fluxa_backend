@@ -14,8 +14,8 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import type { AuthUser } from '../auth/types/auth-user.interface';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { Auth } from 'src/auth/decorators/auth.decorator';
-import { UserRole } from 'src/auth/types/user-role.enum';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { UserRole } from '../auth/types/user-role.enum';
 import { CreateFichaTecnicaDto } from './dto/create-ficha-tecnica.dto';
 
 @Controller('produtos')

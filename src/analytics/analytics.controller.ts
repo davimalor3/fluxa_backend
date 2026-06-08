@@ -1,7 +1,7 @@
 import { Controller, Get, Body } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
-import { UserRole } from 'src/auth/types/user-role.enum';
-import { Auth } from 'src/auth/decorators/auth.decorator';
+import { UserRole } from '../auth/types/user-role.enum';
+import { Auth } from '../auth/decorators/auth.decorator';
 
 @Controller('analytics')
 @Auth(UserRole.GERENTE)
