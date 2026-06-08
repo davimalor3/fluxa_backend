@@ -5,7 +5,7 @@
     "target": "ES2023",
     "rootDir": "./src",
     "outDir": "./dist",
-    // "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "6.0",
     "baseUrl": "./",
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
