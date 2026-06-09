@@ -373,9 +373,11 @@ export class AnalyticsService {
     );
   }
 
-  async hourlySales(restauranteId: string) {
+  async hourlySales(restauranteId: string, inicio?: string, fim?: string) {
+    const range = this.buildDateRange(inicio, fim);
+
     const pagamentos = await this.prisma.pagamentos.findMany({
-      where: this.paymentWhere(restauranteId),
+      where: this.paymentWhere(restauranteId, range),
 
       select: {
         valor_total: true,
@@ -397,9 +399,11 @@ export class AnalyticsService {
     return horas;
   }
 
-  async dailySales(restauranteId: string) {
+  async dailySales(restauranteId: string, inicio?: string, fim?: string) {
+    const range = this.buildDateRange(inicio, fim);
+
     const pagamentos = await this.prisma.pagamentos.findMany({
-      where: this.paymentWhere(restauranteId),
+      where: this.paymentWhere(restauranteId, range),
 
       orderBy: {
         data_pagamento: 'asc',
@@ -422,9 +426,11 @@ export class AnalyticsService {
     }));
   }
 
-  async monthlySales(restauranteId: string) {
+  async monthlySales(restauranteId: string, inicio?: string, fim?: string) {
+    const range = this.buildDateRange(inicio, fim);
+
     const pagamentos = await this.prisma.pagamentos.findMany({
-      where: this.paymentWhere(restauranteId),
+      where: this.paymentWhere(restauranteId, range),
     });
 
     const mapa = new Map<string, number>();
@@ -474,5 +480,61 @@ export class AnalyticsService {
       unidade: produto.unidade_medida,
       nivel: Number(produto.quantidade) <= 3 ? 'CRITICO' : 'BAIXO',
     }));
+  }
+
+  async dashboardComplete(
+    restauranteId: string,
+    inicio?: string,
+    fim?: string,
+  ) {
+    const [
+      resumo,
+      vendas,
+      formasPagamento,
+      topProdutos,
+      topGarcons,
+      desempenhoMesas,
+      vendasDiarias,
+      vendasMensais,
+      vendasHorarias,
+      alertasEstoque,
+    ] = await Promise.all([
+      this.dashboard(restauranteId, inicio, fim),
+      this.sales(restauranteId, inicio, fim),
+      this.paymentMethods(restauranteId, inicio, fim),
+      this.topProducts(restauranteId, inicio, fim),
+      this.topWaiters(restauranteId, inicio, fim),
+      this.tablePerformance(restauranteId, inicio, fim),
+      this.dailySales(restauranteId, inicio, fim),
+      this.monthlySales(restauranteId, inicio, fim),
+      this.hourlySales(restauranteId, inicio, fim),
+      this.stockAlerts(restauranteId),
+    ]);
+
+    return {
+      resumo,
+
+      vendas: {
+        totalVendido: vendas.totalVendido,
+        ticketMedio: vendas.ticketMedio,
+        quantidadeVendas: vendas.quantidadeVendas,
+      },
+
+      formasPagamento,
+
+      topProdutos,
+
+      topGarcons,
+
+      desempenhoMesas,
+
+      vendasDiarias,
+
+      vendasMensais,
+
+      vendasHorarias,
+
+      alertasEstoque,
+    };
   }
 }
