@@ -21,22 +21,21 @@ export class AnalyticsService {
       throw new BadRequestException('Informe início e fim do período.');
     }
 
-    const dataInicio = new Date(inicio);
-    const dataFim = new Date(fim);
+    const [anoInicio, mesInicio, diaInicio] = inicio.split('-').map(Number);
 
-    if (Number.isNaN(dataInicio.getTime())) {
-      throw new BadRequestException('Data inicial inválida.');
-    }
+    const [anoFim, mesFim, diaFim] = fim.split('-').map(Number);
 
-    if (Number.isNaN(dataFim.getTime())) {
-      throw new BadRequestException('Data final inválida.');
-    }
+    const dataInicio = new Date(
+      Date.UTC(anoInicio, mesInicio - 1, diaInicio, 0, 0, 0, 0),
+    );
 
-    dataFim.setHours(23, 59, 59, 999);
+    const dataFimObj = new Date(
+      Date.UTC(anoFim, mesFim - 1, diaFim, 23, 59, 59, 999),
+    );
 
     return {
       inicio: dataInicio,
-      fim: dataFim,
+      fim: dataFimObj,
     };
   }
 
@@ -44,7 +43,7 @@ export class AnalyticsService {
     restauranteId: string,
     range?: DateRange,
   ): Prisma.pagamentosWhereInput {
-    return {
+    const where = {
       deleted_at: null,
       comandas: {
         restaurante_id: restauranteId,
@@ -56,11 +55,20 @@ export class AnalyticsService {
         },
       }),
     };
+
+    console.log('PAYMENT WHERE');
+    console.log(JSON.stringify(where, null, 2));
+
+    return where;
   }
 
   // ========================================================= DASHBOARD
   async dashboard(restauranteId: string, inicio?: string, fim?: string) {
     const range = this.buildDateRange(inicio, fim);
+
+    // TODO: REMOVER LOGS
+    console.log('RANGE FINAL');
+    console.log(range);
 
     const where = this.paymentWhere(restauranteId, range);
 
@@ -128,6 +136,13 @@ export class AnalyticsService {
       }),
     ]);
 
+    console.log('RESULTADO DASHBOARD');
+    console.log({
+      faturamento,
+      pagamentos,
+      comandasFechadas,
+    });
+
     return {
       faturamento: Number(faturamento._sum.valor_total ?? 0),
 
@@ -155,13 +170,18 @@ export class AnalyticsService {
       select: {
         id: true,
         valor_total: true,
-        forma_pagamento: true,
         data_pagamento: true,
       },
-      orderBy: {
-        data_pagamento: 'desc',
-      },
     });
+
+    // TODO: REMOVER LOGS
+    console.log(
+      'PAGAMENTOS ENCONTRADOS:',
+      pagamentos.map((p) => ({
+        valor: p.valor_total,
+        data: p.data_pagamento,
+      })),
+    );
 
     const total = pagamentos.reduce(
       (acc, pagamento) => acc + Number(pagamento.valor_total),
@@ -511,29 +531,26 @@ export class AnalyticsService {
       this.stockAlerts(restauranteId),
     ]);
 
+    console.log('DASHBOARD COMPLETE');
+    console.log({
+      resumo,
+      vendas,
+      formasPagamento,
+    });
     return {
       resumo,
-
       vendas: {
         totalVendido: vendas.totalVendido,
         ticketMedio: vendas.ticketMedio,
         quantidadeVendas: vendas.quantidadeVendas,
       },
-
       formasPagamento,
-
       topProdutos,
-
       topGarcons,
-
       desempenhoMesas,
-
       vendasDiarias,
-
       vendasMensais,
-
       vendasHorarias,
-
       alertasEstoque,
     };
   }

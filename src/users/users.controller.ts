@@ -16,6 +16,7 @@ import type { AuthUser } from '../auth/types/auth-user.interface';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Auth } from '../auth/decorators/auth.decorator';
 import { UpdateGarcomDto } from './dto/update-garcom.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -64,6 +65,16 @@ export class UsersController {
     @CurrentUser() user: AuthUser,
   ) {
     return this.usersService.updateGarcom(id, dto, user.restaurante_id);
+  }
+
+  @Auth(UserRole.GERENTE)
+  @Patch(':id')
+  updateUser(
+    @Param('id') id: string,
+    @Body() dto: UpdateUserDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.usersService.updateUser(id, dto, user.restaurante_id);
   }
 
   @Auth(UserRole.GERENTE)

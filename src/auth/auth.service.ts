@@ -124,12 +124,27 @@ export class AuthService {
       user.restaurante_id,
     );
 
+    const restaurant = await this.prisma.restaurantes.findUnique({
+      where: {
+        id: user.restaurante_id,
+      },
+      select: {
+        id: true,
+        nome: true,
+      },
+    });
+
+    if (!restaurant) {
+      throw new BadRequestException('Restaurante não encontrado');
+    }
+
     return {
       id: user.id,
       nome: user.nome,
       email: user.email,
       role: user.role,
       restaurante_id: user.restaurante_id,
+      restaurante: restaurant,
     };
   }
 
@@ -162,8 +177,22 @@ export class AuthService {
       restaurante_id: user.restaurante_id,
     };
 
+    const restaurant = await this.prisma.restaurantes.findUnique({
+      where: {
+        id: user.restaurante_id,
+      },
+      select: {
+        id: true,
+        nome: true,
+      },
+    });
+
+    if (!restaurant) {
+      throw new BadRequestException('Restaurante não encontrado!');
+    }
+
     // aqui gero o token de acesso usando o payload e retorno ele para o cliente
-    // o payload é o objeto que contém as informações do usuário que serão codificadas no token JWT. O método signAsync do JwtService é usado para gerar o token de acesso
+    // o payload é o objeto que contém as informações do usuário que serão codificadas no token JWT. O método signAsync do JwtService é usado para gerar o token de acess
     return {
       access_token: await this.jwtService.signAsync(payload),
       // aqui retorno as informações do usuário que serão usadas no frontend para exibir o nome do usuário, o email, o papel e o id do restaurante
@@ -173,6 +202,7 @@ export class AuthService {
         email: user.email,
         role: user.role,
         restaurante_id: user.restaurante_id,
+        restaurante: restaurant,
       },
     };
   }

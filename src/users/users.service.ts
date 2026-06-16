@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateGarcomDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateGarcomDto } from './dto/update-garcom.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -185,6 +186,47 @@ export class UsersService {
         id,
       },
       data,
+      select: this.userSelect,
+    });
+  }
+
+  async updateUser(id: string, dto: UpdateUserDto, restauranteId: string) {
+    const user = await this.prisma.usuarios.findFirst({
+      where: {
+        id,
+        restaurante_id: restauranteId,
+        deleted_at: null,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    if (dto.email) {
+      const normalizedEmail = dto.email.trim().toLowerCase();
+
+      const emailAlreadyExists = await this.prisma.usuarios.findFirst({
+        where: {
+          email: normalizedEmail,
+          deleted_at: null,
+          id: { not: id },
+        },
+      });
+
+      if (emailAlreadyExists) {
+        throw new BadRequestException('Email já cadastrado');
+      }
+    }
+
+    return this.prisma.usuarios.update({
+      where: { id },
+      data: {
+        ...(dto.nome && { nome: dto.nome }),
+        ...(dto.email && { email: dto.email.trim().toLowerCase() }),
+        ...(dto.senha && { senha: await bcrypt.hash(dto.senha, 10) }),
+        ...(dto.role && { role: dto.role }),
+      },
       select: this.userSelect,
     });
   }

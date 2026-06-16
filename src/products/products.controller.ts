@@ -28,13 +28,13 @@ export class ProductsController {
     return this.productsService.create(dto, user);
   }
 
-  @Auth(UserRole.GERENTE)
+  @Auth(UserRole.GERENTE, UserRole.GARCOM)
   @Get()
   findAll(@CurrentUser() user: AuthUser) {
     return this.productsService.findAll(user.restaurante_id);
   }
 
-  @Auth(UserRole.GERENTE)
+  @Auth(UserRole.GERENTE, UserRole.GARCOM)
   @Get('produtos')
   findProdutos(@CurrentUser() user: AuthUser) {
     return this.productsService.findProdutos(user.restaurante_id);

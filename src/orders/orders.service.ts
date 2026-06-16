@@ -668,7 +668,6 @@ export class OrdersService {
   }
 
   // ========================================================= CONFIRMAR FECHAMENTO
-
   async confirmarFechamento(
     comandaId: string,
     restauranteId: string,

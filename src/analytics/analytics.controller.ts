@@ -12,7 +12,7 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Get('dashboard')
-  dashboard(
+  getDashboard(
     @CurrentUser() user: AuthUser,
     @Query() filters: AnalyticsFilterDto,
   ) {
