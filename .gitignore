@@ -59,6 +59,3 @@ docker-compose.yml
 docker-compose.override.local.yml
 docker-compose.override.test.yml
 docker-compose.override.production.yml
-
-
-prisma/seed.ts

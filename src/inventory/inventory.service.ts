@@ -177,4 +177,37 @@ export class InventoryService {
       },
     });
   }
+
+  async getEstoque(restauranteId: string) {
+    return this.prisma.produtos.findMany({
+      where: {
+        restaurante_id: restauranteId,
+        deleted_at: null,
+        tipo: {
+          in: [produto_tipo.PRODUTO_SIMPLES, produto_tipo.INSUMO], // Regra do módulo Estoque
+        },
+      },
+      select: {
+        id: true,
+        nome: true,
+        descricao: true,
+        preco: true,
+        quantidade: true,
+        tipo: true,
+        unidade_medida: true,
+        ativo: true,
+        controla_estoque: true,
+        estoque_minimo: true, // Importante para alertar o frontend sobre falta de produto
+        categoria: {
+          select: {
+            id: true,
+            nome: true,
+          },
+        },
+      },
+      orderBy: {
+        nome: 'asc',
+      },
+    });
+  }
 }

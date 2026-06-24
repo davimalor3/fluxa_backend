@@ -30,6 +30,34 @@ export class ProductsService {
     updated_at: true,
   };
 
+  private readonly cardapioSelect = {
+    id: true,
+    nome: true,
+    descricao: true,
+    preco: true,
+    tipo: true,
+    ativo: true,
+
+    ficha_tecnica_ficha_tecnica_produto_idToprodutos: {
+      where: {
+        deleted_at: null,
+      },
+      select: {
+        id: true,
+        quantidade: true,
+        insumo_id: true,
+
+        produtos_ficha_tecnica_insumo_idToprodutos: {
+          select: {
+            id: true,
+            nome: true,
+            unidade_medida: true,
+          },
+        },
+      },
+    },
+  };
+
   // ================================================================ MÉTODO PARA PRDUTOS E INSUMOS
 
   async create(dto: CreateProductDto, user: AuthUser) {
@@ -43,6 +71,11 @@ export class ProductsService {
 
     if (existing) {
       throw new BadRequestException('Já existe um produto com este nome');
+    }
+
+    if (dto.tipo === produto_tipo.PRODUTO_COMPOSTO) {
+      dto.quantidade = 0;
+      dto.controla_estoque = false;
     }
 
     return this.prisma.produtos.create({
@@ -241,24 +274,34 @@ export class ProductsService {
   async findFichaTecnica(produtoId: string, restauranteId: string) {
     await this.findOne(produtoId, restauranteId);
 
-    return this.prisma.ficha_tecnica.findMany({
+    const ficha = await this.prisma.ficha_tecnica.findMany({
       where: {
         produto_id: produtoId,
         deleted_at: null,
       },
-      include: {
+      select: {
+        id: true,
+        produto_id: true,
+        quantidade: true,
+        insumo_id: true,
+
         produtos_ficha_tecnica_insumo_idToprodutos: {
           select: {
             id: true,
             nome: true,
-            quantidade: true,
+            unidade_medida: true,
           },
         },
       },
-      orderBy: {
-        created_at: 'asc',
-      },
     });
+
+    return ficha.map((item) => ({
+      id: item.id,
+      produto_id: item.produto_id,
+      quantidade: item.quantidade,
+      insumo_id: item.insumo_id,
+      insumo: item.produtos_ficha_tecnica_insumo_idToprodutos,
+    }));
   }
 
   async removeFichaTecnica(fichaTecnicaId: string, restauranteId: string) {
@@ -288,5 +331,39 @@ export class ProductsService {
     return {
       message: 'Item removido da ficha técnica',
     };
+  }
+
+  // ========================================================================= MÉTODO PARA cardapio
+
+  async findCardapio(restauranteId: string) {
+    const produtos = await this.prisma.produtos.findMany({
+      where: {
+        restaurante_id: restauranteId,
+        deleted_at: null,
+        tipo: {
+          in: [produto_tipo.PRODUTO_SIMPLES, produto_tipo.PRODUTO_COMPOSTO],
+        },
+      },
+      select: this.cardapioSelect,
+    });
+
+    return produtos.map((produto) => ({
+      id: produto.id,
+      nome: produto.nome,
+      descricao: produto.descricao,
+      preco: produto.preco,
+      tipo: produto.tipo,
+      ativo: produto.ativo,
+
+      ficha_tecnica:
+        produto.ficha_tecnica_ficha_tecnica_produto_idToprodutos.map(
+          (item) => ({
+            id: item.id,
+            quantidade: item.quantidade,
+            insumo_id: item.insumo_id,
+            insumo: item.produtos_ficha_tecnica_insumo_idToprodutos,
+          }),
+        ),
+    }));
   }
 }

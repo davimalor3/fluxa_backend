@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { CatalogModule } from './catalog/catalog.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     AuthModule,
     SubscriptionModule,
     AnalyticsModule,
+    CatalogModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -46,6 +46,12 @@ export class ProductsController {
     return this.productsService.findInsumos(user.restaurante_id);
   }
 
+  @Auth(UserRole.GERENTE, UserRole.GARCOM)
+  @Get('cardapio')
+  findCardapio(@CurrentUser() user: AuthUser) {
+    return this.productsService.findCardapio(user.restaurante_id);
+  }
+
   @Auth(UserRole.GERENTE)
   @Get(':id')
   findOne(@Param('id') id: string, @CurrentUser() user: AuthUser) {

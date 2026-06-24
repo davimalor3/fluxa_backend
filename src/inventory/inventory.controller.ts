@@ -12,6 +12,12 @@ export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
   @Auth(UserRole.GERENTE)
+  @Get()
+  getEstoque(@CurrentUser() user: AuthUser) {
+    return this.inventoryService.getEstoque(user.restaurante_id);
+  }
+
+  @Auth(UserRole.GERENTE)
   @Post('entrada')
   registrarEntrada(
     @Body() dto: CreateStockEntryDto,
