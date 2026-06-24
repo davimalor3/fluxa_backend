@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { CatalogService } from './catalog.service';
 import { AddCatalogProductDto } from './dto/add-catalog-product.dto';
-import { Auth } from 'src/auth/decorators/auth.decorator';
-import { UserRole } from 'src/auth/types/user-role.enum';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
-import { AuthUser } from 'src/auth/types/auth-user.interface';
+import { Auth } from '../auth/decorators/auth.decorator';
+import { UserRole } from '../auth/types/user-role.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser } from '../auth/types/auth-user.interface';
 
 @Controller('catalog')
 @Auth(UserRole.GERENTE)
